@@ -10,7 +10,6 @@ Original file is located at
 # Commented out IPython magic to ensure Python compatibility.
 # %cd "drive/My Drive/Satellite Imagery code"
 
-except
 import utils
 import unet
 import torch
@@ -18,16 +17,23 @@ from torch.utils.data import DataLoader
 from glob import glob as glob
 
 model = unet.UNet()
-utils.testModel(model, "saves/nobalance_noaug_lr1e-4_ternausloss0.5", "media/nobalance_noaug_lr1e-4_ternausloss0.5", video = False, figsize = 15)
+utils.testModel(
+    model,
+    "saves/nobalance_noaug_lr1e-4_ternausloss0.5",
+    "media/nobalance_noaug_lr1e-4_ternausloss0.5",
+    video=False,
+    figsize=15,
+)
 
 model_path = "saves/nobalance_noaug_lr1e-4_ternausloss0.5"
 saves = glob(f"{model_path}/epoch_*")
 print(saves)
 model.load_state_dict(torch.load(saves[0]))
 model.eval()
-dataset = utils.SatelliteDataset(root_dir = "data/dstl/testset", train = False, transform = None)
+dataset = utils.SatelliteDataset(
+    root_dir="data/dstl/testset", train=False, transform=None
+)
 dataloader = iter(DataLoader(dataset, batch_size=5))
 batch = next(dataloader)
 
 model(batch).permute(0, 2, 3, 1).detach().numpy()
-

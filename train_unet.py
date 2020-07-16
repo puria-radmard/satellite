@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 from torch.utils.data import Dataset, DataLoader
 import torch.optim as optim
 import torch.nn as nn
-from config_utils import *
+import argparse
 
 import sys
 
@@ -32,8 +32,8 @@ from utils import (
     SatelliteDataset,
 )
 import unet
-import perf_metrics
-import losses
+from config_utils import *
+from perf_metrics import *
 
 import wandb
 
@@ -121,19 +121,58 @@ def train_unet(
             torch.save(model.state_dict(), f"saves/{dir_name}/epoch_{epoch}")
 
 
-model = unet.UNet()
-lossf = (nn.BCELoss(), "BCE Loss")
-test_metric = (perf_metrics.dice_coef, "dice coefficient")
-dataset = "data/dstl"
+if __name__ == "__main__":
 
-train_unet(
-    model=model,
-    dataset=dataset,
-    batch_size=20,
-    loss_fn=lossf,
-    test_metric=test_metric,
-    num_epochs=20,
-    test_size=0.1,
-    dir_name="nobalance_noaug_lr1e-4_BCEloss",
-    lr=1e-4,
-)
+    parser = argparse.ArgumentParser(
+        description="Give loss function, evaluation metric, and hyperparameters"
+    )
+    parser.add_argument("--loss_name", type=str)
+    parser.add_argument("--loss_parameters", type=str)
+    parser.add_argument("--test_metric", type=str)
+    parser.add_argument("--dataset", type=str)
+    parser.add_argument("--lr", type=float)
+    parser.add_argument("--dir_name", type=str)
+    parser.add_argument("--test_size", type=float)
+    parser.add_argument("--train_size", type=float, default=None)
+    parser.add_argument("--batch_size", type=int)
+
+    args = parser.parse_args()
+
+    model = unet.UNet()
+
+    config_dict = {}
+
+    loss_name = args.loss_name  # "BCELoss"
+    loss_parameters = args.loss_parameters  # file/to/loss/parameters.json
+    config_dict["lossf"] = (loss_dict[loss_name](**loss_parameters), loss_name)
+
+    test_metric = args.test_metric
+    config_dict["test_metric"] = (test_metric_dict[test_metric], test_metric)
+
+    config_dict["dataset"] = "data/dstl"
+
+    config_dict["lr"] = args.lr  # 1e-4
+    config_dict["dir_name"] = args.dir_name  # "nobalance_noaug_lr1e-4_BCEloss"
+    config_dict["test_size"] = args.test_size  # 0.1
+
+    if train_size == None:
+        train_size = 1 - args.test_size
+
+    config_dict["train_size"] = args.train_size  # 0.1
+    config_dict["num_epochs"] = args.num_epochs  # 20
+    config_dict["batch_size"] = args.batch_size
+
+    wandb.init(config=config_dict)
+
+    train_unet(
+        model=model,
+        dataset=config_dict["dataset"],
+        batch_size=config_dict["batch_size"],
+        loss_fn=config_dict["lossf"],
+        test_metric=config_dict["test_metric"],
+        num_epochs=config_dict["num_epochs"],
+        train_size=config_dict["train_size"],
+        test_size=config_dict["test_size"],
+        dir_name=config_dict["dir_name"],
+        lr=config_dict["lr"],
+    )
