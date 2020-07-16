@@ -17,94 +17,123 @@ import matplotlib.pyplot as plt
 from torch.utils.data import Dataset, DataLoader
 import torch.optim as optim
 import torch.nn as nn
- 
-from google.colab import drive
-drive.mount("/drive")
-# %cd "/drive/My Drive/Satellite Imagery code"
- 
+from config_utils import *
+
 import sys
+
 sys.path.append("/content/drive/My Drive/Satellite Imagery code")
 
- 
-!pip install import-ipynb
-import import_ipynb
-from utils import produceImage, trainEpoch, testModel, train_test_dataset, SatelliteDataset
+
+from utils import (
+    produceImage,
+    trainEpoch,
+    testModel,
+    train_test_dataset,
+    SatelliteDataset,
+)
 import unet
 import perf_metrics
 import losses
 
-!pip install wandb
 import wandb
+
 wandb.init(project="unet")
- 
+
 import warnings
+
 warnings.filterwarnings("ignore")
- 
+
 # %matplotlib inline
 
 import sys
 import time
- 
-def train_unet(model, dataset, batch_size, loss_fn, test_metric, num_epochs, dir_name, 
-               train_num_steps = None, eval_num_steps = None, lr = 1e-4, save_rate = 10, 
-               test_size = 0.3, train_size = None, random_state = 1):
-  
-  if torch.cuda.is_available():
-    torch.set_default_tensor_type('torch.cuda.FloatTensor')
-    model.cuda()
- 
-  wandb.watch(model)
 
-  print(len(glob(dataset+"/"+"images"+"/*")))
- 
-  optimizer = optim.Adam(model.parameters(), lr=lr)
-  train_dataset, test_dataset = train_test_dataset(dataset, test_size=test_size, train_size=train_size, random_state=random_state)
-  train_dataloader = DataLoader(train_dataset, batch_size = batch_size)
-  test_dataloader = DataLoader(test_dataset, batch_size = batch_size)           # Change to own batch size?
- 
-  print(torch.cuda.get_device_name(0))
-  if not train_num_steps:
-    train_num_steps = len(train_dataloader)
-  if not eval_num_steps:
-    eval_num_steps = len(test_dataloader)
-  print("Starting training for {} epochs of {} training steps and {} evaluation steps".format(num_epochs, train_num_steps, eval_num_steps))
- 
-  #for epoch in range(recent_epoch + 1, recent_epoch + num_epochs + 1):
-  for epoch in range(num_epochs):
-    
-    epoch_loss = trainEpoch(model, epoch, optimizer, train_dataloader, train_num_steps, loss_fn[0])
-    print(f"Training epoch {epoch} done")
 
-    epoch_score = testModel(model, epoch, test_dataloader, eval_num_steps, test_metric[0])
-    print(f"Evaluating epoch {epoch} done")
+def train_unet(
+    model,
+    dataset,
+    batch_size,
+    loss_fn,
+    test_metric,
+    num_epochs,
+    dir_name,
+    train_num_steps=None,
+    eval_num_steps=None,
+    lr=1e-4,
+    save_rate=10,
+    test_size=0.3,
+    train_size=None,
+    random_state=1,
+):
 
-    produceImage(model, epoch, dir_name, dataset)
-    
-    epoch_metrics = {
-        f"Epoch Loss ({loss_fn[1]})": epoch_loss,
-        f"Epoch Score ({test_metric[1]})": epoch_score
-    }
+    if torch.cuda.is_available():
+        torch.set_default_tensor_type("torch.cuda.FloatTensor")
+        model.cuda()
 
-    wandb.log(epoch_metrics)
+    wandb.watch(model)
 
-    if epoch%save_rate == 0:
-      print(f" ###   Saving to saves/{dir_name}/epoch_{epoch}")
-      torch.save(model.state_dict(), f"saves/{dir_name}/epoch_{epoch}")
+    print(len(glob(dataset + "/" + "images" + "/*")))
+
+    optimizer = optim.Adam(model.parameters(), lr=lr)
+    train_dataset, test_dataset = train_test_dataset(
+        dataset, test_size=test_size, train_size=train_size, random_state=random_state
+    )
+    train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
+    test_dataloader = DataLoader(
+        test_dataset, batch_size=batch_size
+    )  # Change to own batch size?
+
+    print(torch.cuda.get_device_name(0))
+    if not train_num_steps:
+        train_num_steps = len(train_dataloader)
+    if not eval_num_steps:
+        eval_num_steps = len(test_dataloader)
+    print(
+        "Starting training for {} epochs of {} training steps and {} evaluation steps".format(
+            num_epochs, train_num_steps, eval_num_steps
+        )
+    )
+
+    # for epoch in range(recent_epoch + 1, recent_epoch + num_epochs + 1):
+    for epoch in range(num_epochs):
+
+        epoch_loss = trainEpoch(
+            model, epoch, optimizer, train_dataloader, train_num_steps, loss_fn[0]
+        )
+        print(f"Training epoch {epoch} done")
+
+        epoch_score = testModel(
+            model, epoch, test_dataloader, eval_num_steps, test_metric[0]
+        )
+        print(f"Evaluating epoch {epoch} done")
+
+        produceImage(model, epoch, dir_name, dataset)
+
+        epoch_metrics = {
+            f"Epoch Loss ({loss_fn[1]})": epoch_loss,
+            f"Epoch Score ({test_metric[1]})": epoch_score,
+        }
+
+        wandb.log(epoch_metrics)
+
+        if epoch % save_rate == 0:
+            print(f" ###   Saving to saves/{dir_name}/epoch_{epoch}")
+            torch.save(model.state_dict(), f"saves/{dir_name}/epoch_{epoch}")
+
 
 model = unet.UNet()
 lossf = (nn.BCELoss(), "BCE Loss")
 test_metric = (perf_metrics.dice_coef, "dice coefficient")
 dataset = "data/dstl"
 
-train_unet(model = model, 
-           dataset= dataset,
-           batch_size = 20, 
-           loss_fn = lossf,
-           test_metric = test_metric, 
-           num_epochs = 20,
-           test_size = 0.1,
-           dir_name = "nobalance_noaug_lr1e-4_BCEloss",
-           lr = 1e-4)
-
-
-
+train_unet(
+    model=model,
+    dataset=dataset,
+    batch_size=20,
+    loss_fn=lossf,
+    test_metric=test_metric,
+    num_epochs=20,
+    test_size=0.1,
+    dir_name="nobalance_noaug_lr1e-4_BCEloss",
+    lr=1e-4,
+)

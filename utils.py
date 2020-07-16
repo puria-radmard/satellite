@@ -20,6 +20,7 @@ import sys
 import cv2
 import time
 import wandb
+import subprocess
  
 # Ignore warnings
 import warnings
@@ -269,13 +270,11 @@ def generateBoundaryMap(mask_dir, save_dir):
 
 
 def produceBoundaryMaps():
-  #from google.colab import drive
-  #drive.mount("drive")
-  #%cd /content/drive/My Drive/Satellite Imagery code/data/dstl
-  !mkdir "boundaries"
+
+  subprocess.call(["mkdir", "boundaries"])
 
   mask_dirs = glob("labels/*.png")
-  #mask_dirs = ["labels/290.png"]
+
   save_dirs = [f"boundaries/{n}" for n in [a.split("/")[-1] for a in mask_dirs]]
   
   for i in range(len(mask_dirs)):

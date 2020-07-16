@@ -8,12 +8,9 @@ Original file is located at
 """
 
 # Commented out IPython magic to ensure Python compatibility.
-from google.colab import drive
-drive.mount("drive")
 # %cd "drive/My Drive/Satellite Imagery code"
 
-!pip install import-ipynb
-import import_ipynb
+except
 import utils
 import unet
 import torch

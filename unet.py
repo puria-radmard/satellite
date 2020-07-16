@@ -11,129 +11,130 @@ import torch
 import torch.nn as nn
 import numpy as np
 
+
 class UNetDownBlock(nn.Module):
-  def __init__(self, in_channels, out_channels, max_before = True):
+    def __init__(self, in_channels, out_channels, max_before=True):
 
-    super().__init__()
+        super().__init__()
 
-    layers = [
-        nn.Conv2d(in_channels, out_channels, kernel_size = 3, padding = 1),
-        nn.BatchNorm2d(out_channels),
-        nn.ReLU(inplace = True),
-        nn.Conv2d(out_channels, out_channels, kernel_size = 3, padding = 1),
-        nn.BatchNorm2d(out_channels),
-        nn.ReLU(inplace = True)
-    ]
+        layers = [
+            nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+        ]
 
-    if max_before:
-      layers.insert(
-          0, nn.MaxPool2d(2)
-      )
+        if max_before:
+            layers.insert(0, nn.MaxPool2d(2))
 
-    self.downblock = nn.Sequential(*layers)
-  
-  def forward(self, X):
-    X = X.float()
-    return self.downblock(X)
+        self.downblock = nn.Sequential(*layers)
 
+    def forward(self, X):
+        X = X.float()
+        return self.downblock(X)
 
 
 class UNetUpBlock(nn.Module):
-  def __init__(self, in_channels, out_channels):
-    super().__init__()
+    def __init__(self, in_channels, out_channels):
+        super().__init__()
 
-    # Channels are doubled by upconv
-    layers = [
-        nn.Conv2d(in_channels, out_channels, kernel_size = 3, padding = 1),
-        nn.BatchNorm2d(out_channels),
-        nn.ReLU(inplace = True),
-        nn.Conv2d(out_channels, out_channels, kernel_size = 3, padding = 1),
-        nn.BatchNorm2d(out_channels),
-        nn.ReLU(inplace = True)
-    ]
-        
-    self.upconv = nn.ConvTranspose2d(in_channels, out_channels, kernel_size = 2, stride = 2)
-    self.dbconv = nn.Sequential(*layers)
-  
-  def forward(self, X1, X2):
-    X1 = X1.float()
-    X2 = X2.float()
-    X1 = self.upconv(X1)
+        # Channels are doubled by upconv
+        layers = [
+            nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+        ]
 
-    # Taking input NCHW
-    X = torch.cat([X2, X1], dim=1)
+        self.upconv = nn.ConvTranspose2d(
+            in_channels, out_channels, kernel_size=2, stride=2
+        )
+        self.dbconv = nn.Sequential(*layers)
 
-    return self.dbconv(X)
+    def forward(self, X1, X2):
+        X1 = X1.float()
+        X2 = X2.float()
+        X1 = self.upconv(X1)
 
+        # Taking input NCHW
+        X = torch.cat([X2, X1], dim=1)
+
+        return self.dbconv(X)
 
 
 class UNetOutBlock(nn.Module):
-  def __init__(self, in_channels, out_channels):
-    super(UNetOutBlock, self).__init__()
-    self.conv = nn.Conv2d(in_channels, out_channels, kernel_size = 1)
+    def __init__(self, in_channels, out_channels):
+        super(UNetOutBlock, self).__init__()
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size=1)
 
-  def forward(self, X):
-    X = X.float()
-    return self.conv(X)
-
+    def forward(self, X):
+        X = X.float()
+        return self.conv(X)
 
 
 class UNet(nn.Module):
-  def __init__(self, n_channels = 3, n_classes = 1):
-    super(UNet, self).__init__()
-    
-    # To call later
-    self.n_classes = n_classes
+    def __init__(self, n_channels=3, n_classes=1):
+        super(UNet, self).__init__()
 
-    convchan1 = 64
-    convchan2 = 128
-    convchan3 = 256
-    convchan4 = 512
-    convchan5 = 1024
+        # To call later
+        self.n_classes = n_classes
 
-    self.down1 = UNetDownBlock(n_channels, convchan1, max_before = False)
-    self.down2 = UNetDownBlock(convchan1, convchan2)
-    self.down3 = UNetDownBlock(convchan2, convchan3)
-    self.down4 = UNetDownBlock(convchan3, convchan4)
-    self.down5 = UNetDownBlock(convchan4, convchan5)
+        convchan1 = 64
+        convchan2 = 128
+        convchan3 = 256
+        convchan4 = 512
+        convchan5 = 1024
 
-    convchan6 = 512
-    convchan7 = 256
-    convchan8 = 128
-    convchan9 = 64
+        self.down1 = UNetDownBlock(n_channels, convchan1, max_before=False)
+        self.down2 = UNetDownBlock(convchan1, convchan2)
+        self.down3 = UNetDownBlock(convchan2, convchan3)
+        self.down4 = UNetDownBlock(convchan3, convchan4)
+        self.down5 = UNetDownBlock(convchan4, convchan5)
 
-    self.up1 = UNetUpBlock(convchan5, convchan6)
-    self.up2 = UNetUpBlock(convchan6, convchan7)
-    self.up3 = UNetUpBlock(convchan7, convchan8)
-    self.up4 = UNetUpBlock(convchan8, convchan9)
+        convchan6 = 512
+        convchan7 = 256
+        convchan8 = 128
+        convchan9 = 64
 
-    self.out = UNetOutBlock(convchan9, n_classes)
-  
-  def forward(self, X, reorder = True):
-    """
+        self.up1 = UNetUpBlock(convchan5, convchan6)
+        self.up2 = UNetUpBlock(convchan6, convchan7)
+        self.up3 = UNetUpBlock(convchan7, convchan8)
+        self.up4 = UNetUpBlock(convchan8, convchan9)
+
+        self.out = UNetOutBlock(convchan9, n_classes)
+
+    def forward(self, X, reorder=True):
+        """
     Layers take inputs of size [N, C, H, W]
     Forward takes inputs of size [N, H, W, C] or [H, W, C]
     """
-    if len(np.shape(X)) == 3: X = X[np.newaxis, :]
-    if reorder: X = X.permute(0, 3, 1, 2)
-    if np.shape(X)[1] == 4: X = X[:, :3, :, :]
-    
-    assert torch.min(X) >= -1 and torch.max(X) <= 1
+        if len(np.shape(X)) == 3:
+            X = X[np.newaxis, :]
+        if reorder:
+            X = X.permute(0, 3, 1, 2)
+        if np.shape(X)[1] == 4:
+            X = X[:, :3, :, :]
 
-    X1 = self.down1(X)
-    X2 = self.down2(X1)
-    X3 = self.down3(X2)
-    X4 = self.down4(X3)
-    X5 = self.down5(X4)
-    up = self.up1(X5, X4)
-    up = self.up2(up, X3)
-    up = self.up3(up, X2)
-    up = self.up4(up, X1)
-    logits = self.out(up)
+        assert torch.min(X) >= -1 and torch.max(X) <= 1
 
-    if self.n_classes == 1:
-      logits = nn.Sigmoid()(logits)
-    else:
-      logits = nn.Softmax(dim=1)(logits)
+        X1 = self.down1(X)
+        X2 = self.down2(X1)
+        X3 = self.down3(X2)
+        X4 = self.down4(X3)
+        X5 = self.down5(X4)
+        up = self.up1(X5, X4)
+        up = self.up2(up, X3)
+        up = self.up3(up, X2)
+        up = self.up4(up, X1)
+        logits = self.out(up)
 
-    return logits
+        if self.n_classes == 1:
+            logits = nn.Sigmoid()(logits)
+        else:
+            logits = nn.Softmax(dim=1)(logits)
+
+        return logits
