@@ -1,0 +1,20 @@
+on: [push]
+
+- name: gist-sync
+  uses: Popsiclestick/gist-sync-action@v1.0.0
+
+jobs:
+  gist-sync:
+    name: gist-sync
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: popsiclestick/gist-sync-action@v1.0.0
+        id: sync
+        with:
+          auth: 46c8bbd292e4bc80cde648185ab3530cb6eaf9c1
+          gist_url: https://gist.github.com/puria-radmard/5c94267f5c92dc7c61aa566047eb46ea
+          gist_title: Example Gist Title
+          gist_description: Example Gist Description
+          github_file: ../../README.md
