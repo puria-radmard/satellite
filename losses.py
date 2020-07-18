@@ -19,7 +19,7 @@ def cross_entropy(y, t, beta):
     mag = np.sqrt(beta ** 2 + 1)
     beta_ = beta / mag
     alpha_ = 1 / mag
-    return beta_ * t * torch.log2(y) + alpha_ * (1 - t) * torch.log2(y)
+    return beta_ * t * torch.log2(y) + alpha_ * (1 - t) * torch.log2(1 - y)
 
 
 def perPixelCrossEntropy(preds, labels, class_weights=None):
