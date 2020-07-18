@@ -10,6 +10,7 @@ Original file is located at
 # Commented out IPython magic to ensure Python compatibility.
 import os
 from glob import glob as glob
+import json
 import torch
 import numpy as np
 from skimage import io, transform
@@ -49,22 +50,27 @@ import sys
 import time
 
 
+
+
+
+
 def train_unet(
-    model,
-    dataset,
-    batch_size,
-    loss_fn,
-    test_metric,
-    num_epochs,
-    dir_name,
-    train_num_steps=None,
-    eval_num_steps=None,
-    lr=1e-4,
-    save_rate=10,
-    test_size=0.3,
-    train_size=None,
-    random_state=1,
+    dataset,#
+    batch_size,#
+    loss_func,#
+    test_metric,#
+    num_epochs,#
+    dir_name,#
+    dropout,#
+    lr,#
+    loss_parameters,#
+    save_rate,
+    test_size,#
+    train_size,#
+    random_state,
 ):
+
+    model = unet.UNet(dropout=dropout)
 
     if torch.cuda.is_available():
         torch.set_default_tensor_type("torch.cuda.FloatTensor")
@@ -72,7 +78,9 @@ def train_unet(
 
     wandb.watch(model)
 
-    print(len(glob(dataset + "/" + "images" + "/*")))
+    loss_func = loss_dict[loss_func](**loss_parameters)
+
+    print(len(glob(dataset + "/" + "images" + "/*")), "images found total")
 
     optimizer = optim.Adam(model.parameters(), lr=lr)
     train_dataset, test_dataset = train_test_dataset(
@@ -84,10 +92,9 @@ def train_unet(
     )  # Change to own batch size?
 
     print(torch.cuda.get_device_name(0))
-    if not train_num_steps:
-        train_num_steps = len(train_dataloader)
-    if not eval_num_steps:
-        eval_num_steps = len(test_dataloader)
+
+    train_num_steps = len(train_dataloader)
+    eval_num_steps = len(test_dataloader)
     print(
         "Starting training for {} epochs of {} training steps and {} evaluation steps".format(
             num_epochs, train_num_steps, eval_num_steps
@@ -98,7 +105,7 @@ def train_unet(
     for epoch in range(num_epochs):
 
         epoch_loss = trainEpoch(
-            model, epoch, optimizer, train_dataloader, train_num_steps, loss_fn[0]
+            model, epoch, optimizer, train_dataloader, train_num_steps, loss_func
         )
         print(f"Training epoch {epoch} done")
 
@@ -110,14 +117,14 @@ def train_unet(
         produceImage(model, epoch, dir_name, dataset)
 
         epoch_metrics = {
-            f"Epoch Loss ({loss_fn[1]})": epoch_loss,
+            f"Epoch Loss ({loss_func[1]})": epoch_loss,
             f"Epoch Score ({test_metric[1]})": epoch_score,
         }
 
         wandb.log(epoch_metrics)
 
         if epoch % save_rate == 0:
-            print(f" ###   Saving to saves/{dir_name}/epoch_{epoch}")
+            print(f"      Saving to saves/{dir_name}/epoch_{epoch}")
             torch.save(model.state_dict(), f"saves/{dir_name}/epoch_{epoch}")
 
 
@@ -126,7 +133,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Give loss function, evaluation metric, and hyperparameters"
     )
-    parser.add_argument("--loss_name", type=str)
+    parser.add_argument("--loss_func", type=str)
     parser.add_argument("--loss_parameters", type=str)
     parser.add_argument("--test_metric", type=str)
     parser.add_argument("--dataset", type=str)
@@ -135,44 +142,53 @@ if __name__ == "__main__":
     parser.add_argument("--test_size", type=float)
     parser.add_argument("--train_size", type=float, default=None)
     parser.add_argument("--batch_size", type=int)
+    parser.add_argument("--dropout", type=float)
+    parser.add_argument("--save_rate", type=int)
+    parser.add_argument("--random_state", type=int, default=1)
 
     args = parser.parse_args()
 
-    model = unet.UNet()
+    loss_parameters = args.loss_parameters
+    with open(loss_parameters, "r") as loss_parameters_file:
+        loss_parameters = json.load(loss_parameters_file)
 
-    config_dict = {}
-
-    loss_name = args.loss_name  # "BCELoss"
-    loss_parameters = args.loss_parameters  # file/to/loss/parameters.json
-    config_dict["lossf"] = (loss_dict[loss_name](**loss_parameters), loss_name)
-
-    test_metric = args.test_metric
-    config_dict["test_metric"] = (test_metric_dict[test_metric], test_metric)
-
-    config_dict["dataset"] = "data/dstl"
-
-    config_dict["lr"] = args.lr  # 1e-4
-    config_dict["dir_name"] = args.dir_name  # "nobalance_noaug_lr1e-4_BCEloss"
-    config_dict["test_size"] = args.test_size  # 0.1
+    test_size = args.test_size
 
     if train_size == None:
         train_size = 1 - args.test_size
 
-    config_dict["train_size"] = args.train_size  # 0.1
-    config_dict["num_epochs"] = args.num_epochs  # 20
-    config_dict["batch_size"] = args.batch_size
+    training_settings_dict = {
+        "test_metric": args.test_metric,
+        "loss_func": args.loss_func,
+        "num_epochs": args.num_epochs,
+        "save_rate": args.save_rate,
+        "random_state": args.random_state
+    }
+
+    data_parameters_dict = {
+        "dataset": args.dataset,
+        "dir_name": args.dir_name,
+        "test_size": test_size,
+        "train_size": train_size,
+    }
+
+    hyperparameters_dict = {
+        "lr": args.lr,
+        "dropout": args.dropout,
+        "batch_size": args.batch_size,
+        "loss_parameters": loss_parameters,
+    }
+
+    config_dict = {
+        "training_settings": training_settings_dict,
+        "data_parameters": data_parameters_dict,
+        "hyperparmeters": hyperparameters_dict
+    }
 
     wandb.init(config=config_dict)
 
     train_unet(
-        model=model,
-        dataset=config_dict["dataset"],
-        batch_size=config_dict["batch_size"],
-        loss_fn=config_dict["lossf"],
-        test_metric=config_dict["test_metric"],
-        num_epochs=config_dict["num_epochs"],
-        train_size=config_dict["train_size"],
-        test_size=config_dict["test_size"],
-        dir_name=config_dict["dir_name"],
-        lr=config_dict["lr"],
+        **config_dict["training_settings"],
+        **config_dict["data_parameters"],
+        **config_dict["hyperparameters"],
     )

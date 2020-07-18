@@ -1,6 +1,6 @@
-torch
-numpy
-skimage
+torch==1.5.1
+numpy==1.19.0
+skimage==0.16.2
 matplotlib
-cv2
-wandb
+cv2==4.1.2
+wandb==0.9.3

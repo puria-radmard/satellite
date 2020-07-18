@@ -9,11 +9,16 @@ Original file is located at
 
 import torch
 import torch.nn as nn
+import numpy as np
 
 
 def cross_entropy(y, t, beta):
     # y is preds, t is labels as per Bishop
-    return beta * t * torch.log2(y) + (1 - t) * torch.log2(y)
+    # Normalise ratio
+    mag = np.sqrt(beta ** 2 + 1)
+    beta_ = beta / mag
+    alpha_ = 1 / mag
+    return beta_ * t * torch.log2(y) + alpha_ * (1 - t) * torch.log2(y)
 
 
 def perPixelCrossEntropy(preds, labels, class_weights=None):

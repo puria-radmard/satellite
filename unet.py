@@ -13,7 +13,7 @@ import numpy as np
 
 
 class UNetDownBlock(nn.Module):
-    def __init__(self, in_channels, out_channels, max_before=True):
+    def __init__(self, in_channels, out_channels, dropout, max_before=True):
 
         super().__init__()
 
@@ -21,9 +21,11 @@ class UNetDownBlock(nn.Module):
             nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
+            nn.Dropout(p=dropout),
             nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
+            nn.Dropout(p=dropout),
         ]
 
         if max_before:
@@ -37,7 +39,7 @@ class UNetDownBlock(nn.Module):
 
 
 class UNetUpBlock(nn.Module):
-    def __init__(self, in_channels, out_channels):
+    def __init__(self, in_channels, out_channels, dropout):
         super().__init__()
 
         # Channels are doubled by upconv
@@ -45,9 +47,11 @@ class UNetUpBlock(nn.Module):
             nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
+            nn.Dropout(p=dropout),
             nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
+            nn.Dropout(p=dropout),
         ]
 
         self.upconv = nn.ConvTranspose2d(
@@ -77,7 +81,7 @@ class UNetOutBlock(nn.Module):
 
 
 class UNet(nn.Module):
-    def __init__(self, n_channels=3, n_classes=1):
+    def __init__(self, dropout, n_channels=3, n_classes=1):
         super(UNet, self).__init__()
 
         # To call later
@@ -90,20 +94,20 @@ class UNet(nn.Module):
         convchan5 = 1024
 
         self.down1 = UNetDownBlock(n_channels, convchan1, max_before=False)
-        self.down2 = UNetDownBlock(convchan1, convchan2)
-        self.down3 = UNetDownBlock(convchan2, convchan3)
-        self.down4 = UNetDownBlock(convchan3, convchan4)
-        self.down5 = UNetDownBlock(convchan4, convchan5)
+        self.down2 = UNetDownBlock(convchan1, convchan2, dropout)
+        self.down3 = UNetDownBlock(convchan2, convchan3, dropout)
+        self.down4 = UNetDownBlock(convchan3, convchan4, dropout)
+        self.down5 = UNetDownBlock(convchan4, convchan5, dropout)
 
         convchan6 = 512
         convchan7 = 256
         convchan8 = 128
         convchan9 = 64
 
-        self.up1 = UNetUpBlock(convchan5, convchan6)
-        self.up2 = UNetUpBlock(convchan6, convchan7)
-        self.up3 = UNetUpBlock(convchan7, convchan8)
-        self.up4 = UNetUpBlock(convchan8, convchan9)
+        self.up1 = UNetUpBlock(convchan5, convchan6, dropout)
+        self.up2 = UNetUpBlock(convchan6, convchan7, dropout)
+        self.up3 = UNetUpBlock(convchan7, convchan8, dropout)
+        self.up4 = UNetUpBlock(convchan8, convchan9, dropout)
 
         self.out = UNetOutBlock(convchan9, n_classes)
 
