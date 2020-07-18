@@ -17,4 +17,4 @@ jobs:
           gist_url: https://gist.github.com/puria-radmard/5c94267f5c92dc7c61aa566047eb46ea
           gist_title: Example Gist Title
           gist_description: Example Gist Description
-          github_file: ../../README.md
+          github_file: /home/puria-radmard/Repos/satellite-imagery/README.md
