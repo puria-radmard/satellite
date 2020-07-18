@@ -9,6 +9,7 @@ Original file is located at
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as f
 import numpy as np
 
 
@@ -18,13 +19,14 @@ def cross_entropy(y, t, beta):
     mag = np.sqrt(beta ** 2 + 1)
     beta_ = beta / mag
     alpha_ = 1 / mag
-    return beta_ * t * torch.log2(y) + alpha_ * (1 - t) * torch.log2(y)
+    return beta_ * t * torch.log2(y) + alpha_ * (1 - t) * torch.log2(1 - y)
 
 
 def perPixelCrossEntropy(preds, labels, class_weights=None):
     batch_size, n_classes, H, W = preds.shape
     if class_weights == None:
         class_weights = torch.ones(n_classes)
+    class_weights = f.normalize(class_weights, dim=0)
     size = torch.prod(torch.tensor(labels.shape)).float()
 
     assert preds.shape == labels.shape
@@ -44,6 +46,7 @@ def jaccardIndex(preds, labels, class_weights=None):
     batch_size, n_classes, H, W = preds.shape
     if class_weights == None:
         class_weights = torch.ones(n_classes)
+    class_weights = f.normalize(class_weights, dim=0)
     size = torch.prod(torch.tensor(labels.shape)).float()
 
     assert preds.shape == labels.shape
