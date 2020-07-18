@@ -50,23 +50,19 @@ import sys
 import time
 
 
-
-
-
-
 def train_unet(
-    dataset,#
-    batch_size,#
-    loss_func,#
-    test_metric,#
-    num_epochs,#
-    dir_name,#
-    dropout,#
-    lr,#
-    loss_parameters,#
+    dataset,  #
+    batch_size,  #
+    loss_func,  #
+    test_metric,  #
+    num_epochs,  #
+    dir_name,  #
+    dropout,  #
+    lr,  #
+    loss_parameters,  #
     save_rate,
-    test_size,#
-    train_size,#
+    test_size,  #
+    train_size,  #
     random_state,
 ):
 
@@ -162,7 +158,7 @@ if __name__ == "__main__":
         "loss_func": args.loss_func,
         "num_epochs": args.num_epochs,
         "save_rate": args.save_rate,
-        "random_state": args.random_state
+        "random_state": args.random_state,
     }
 
     data_parameters_dict = {
@@ -182,7 +178,7 @@ if __name__ == "__main__":
     config_dict = {
         "training_settings": training_settings_dict,
         "data_parameters": data_parameters_dict,
-        "hyperparmeters": hyperparameters_dict
+        "hyperparmeters": hyperparameters_dict,
     }
 
     wandb.init(config=config_dict)
