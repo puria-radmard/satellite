@@ -2,3 +2,4 @@ github_push.sh
 data/*/*/*
 media/*/*
 saves/*/*
+wandb
