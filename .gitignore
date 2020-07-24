@@ -3,3 +3,4 @@ data/*/*/*
 media/*/*
 saves/*/*
 wandb
+__pycache__
