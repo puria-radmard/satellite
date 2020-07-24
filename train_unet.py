@@ -51,21 +51,9 @@ import time
 
 
 def train_unet(
-    dataset,  #
-    batch_size,  #
-    loss_func,  #
-    test_metric,  #
-    num_epochs,  #
-    dir_name,  #
-    dropout,  #
-    lr,  #
-    loss_parameters,  #
-    save_rate,
-    test_size,  #
-    train_size,  #
-    random_state,
+    **kwargs
 ):
-
+    exit()
     if torch.cuda.is_available():
         torch.set_default_tensor_type("torch.cuda.FloatTensor")
         model.cuda()

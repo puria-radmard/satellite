@@ -1,59 +1,13 @@
-2020-07-24 23:06:54,192 ERROR   MainThread:14606 [internal.py:execute():111] 400 response executing GraphQL.
-2020-07-24 23:06:54,193 ERROR   MainThread:14606 [internal.py:execute():112] {"errors":[{"message":"Sweep user not valid","path":["upsertSweep"]}],"data":{"upsertSweep":null}}
-2020-07-24 23:06:54,195 ERROR   MainThread:14606 [cli.py:wrapper():161] Traceback (most recent call last):
-  File "/home/puria-radmard/anaconda3/lib/python3.7/site-packages/wandb/retry.py", line 95, in __call__
-    result = self._call_fn(*args, **kwargs)
-  File "/home/puria-radmard/anaconda3/lib/python3.7/site-packages/wandb/apis/internal.py", line 114, in execute
-    six.reraise(*sys.exc_info())
-  File "/home/puria-radmard/anaconda3/lib/python3.7/site-packages/six.py", line 703, in reraise
-    raise value
-  File "/home/puria-radmard/anaconda3/lib/python3.7/site-packages/wandb/apis/internal.py", line 108, in execute
-    return self.client.execute(*args, **kwargs)
-  File "/home/puria-radmard/anaconda3/lib/python3.7/site-packages/gql/client.py", line 52, in execute
-    result = self._get_result(document, *args, **kwargs)
-  File "/home/puria-radmard/anaconda3/lib/python3.7/site-packages/gql/client.py", line 60, in _get_result
-    return self.transport.execute(document, *args, **kwargs)
-  File "/home/puria-radmard/anaconda3/lib/python3.7/site-packages/gql/transport/requests.py", line 39, in execute
-    request.raise_for_status()
-  File "/home/puria-radmard/anaconda3/lib/python3.7/site-packages/requests/models.py", line 940, in raise_for_status
-    raise HTTPError(http_error_msg, response=self)
-requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://api.wandb.ai/graphql
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/home/puria-radmard/anaconda3/lib/python3.7/site-packages/wandb/apis/__init__.py", line 72, in wrapper
-    return func(*args, **kwargs)
-  File "/home/puria-radmard/anaconda3/lib/python3.7/site-packages/wandb/apis/internal.py", line 1402, in upsert_sweep
-    raise(e)
-  File "/home/puria-radmard/anaconda3/lib/python3.7/site-packages/wandb/apis/internal.py", line 1400, in upsert_sweep
-    check_retry_fn=no_retry_4xx)
-  File "/home/puria-radmard/anaconda3/lib/python3.7/site-packages/wandb/retry.py", line 102, in __call__
-    if not check_retry_fn(e):
-  File "/home/puria-radmard/anaconda3/lib/python3.7/site-packages/wandb/apis/internal.py", line 1388, in no_retry_4xx
-    raise UsageError(body['errors'][0]['message'])
-wandb.apis.UsageError: Sweep user not valid
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/home/puria-radmard/anaconda3/lib/python3.7/site-packages/wandb/cli.py", line 156, in wrapper
-    return func(*args, **kwargs)
-  File "/home/puria-radmard/anaconda3/lib/python3.7/site-packages/wandb/cli.py", line 1200, in sweep
-    sweep_id = api.upsert_sweep(config, project=project, entity=entity, obj_id=sweep_obj_id)
-  File "/home/puria-radmard/anaconda3/lib/python3.7/site-packages/wandb/apis/__init__.py", line 109, in wrapper
-    message, err), sys.exc_info()[2])
-  File "/home/puria-radmard/anaconda3/lib/python3.7/site-packages/six.py", line 702, in reraise
-    raise value.with_traceback(tb)
-  File "/home/puria-radmard/anaconda3/lib/python3.7/site-packages/wandb/apis/__init__.py", line 72, in wrapper
-    return func(*args, **kwargs)
-  File "/home/puria-radmard/anaconda3/lib/python3.7/site-packages/wandb/apis/internal.py", line 1402, in upsert_sweep
-    raise(e)
-  File "/home/puria-radmard/anaconda3/lib/python3.7/site-packages/wandb/apis/internal.py", line 1400, in upsert_sweep
-    check_retry_fn=no_retry_4xx)
-  File "/home/puria-radmard/anaconda3/lib/python3.7/site-packages/wandb/retry.py", line 102, in __call__
-    if not check_retry_fn(e):
-  File "/home/puria-radmard/anaconda3/lib/python3.7/site-packages/wandb/apis/internal.py", line 1388, in no_retry_4xx
-    raise UsageError(body['errors'][0]['message'])
-wandb.apis.CommError: Sweep user not valid
-
+2020-07-24 23:47:05,600 DEBUG   MainThread:18702 [wandb_config.py:_load_defaults():154] no defaults not found in config-defaults.yaml
+2020-07-24 23:47:05,606 DEBUG   MainThread:18702 [meta.py:_setup_code_git():49] probe for git information
+2020-07-24 23:47:05,650 DEBUG   MainThread:18702 [run_manager.py:__init__():547] Initialized sync for unet/2gtfm314
+2020-07-24 23:47:05,652 INFO    MainThread:18702 [run_manager.py:wrap_existing_process():1149] wrapping existing process 18675
+2020-07-24 23:47:05,653 WARNING MainThread:18702 [io_wrap.py:register():108] SIGWINCH handler was not None: <Handlers.SIG_DFL: 0>
+2020-07-24 23:47:05,736 INFO    MainThread:18702 [run_manager.py:init_run():928] system metrics and metadata threads started
+2020-07-24 23:47:05,736 INFO    MainThread:18702 [run_manager.py:wrap_existing_process():1166] informing user process we are ready to proceed
+2020-07-24 23:47:05,737 INFO    MainThread:18702 [run_manager.py:_sync_etc():1298] entering loop for messages from user process
+2020-07-24 23:47:05,745 INFO    MainThread:18702 [run_manager.py:_sync_etc():1321] received message from user process: {"exitcode": 0}
+2020-07-24 23:47:05,745 INFO    MainThread:18702 [run_manager.py:_sync_etc():1408] closing log streams and sending exitcode to W&B
+2020-07-24 23:47:05,745 INFO    MainThread:18702 [run_manager.py:shutdown():1072] shutting down system stats and metadata service
+2020-07-24 23:47:06,605 INFO    Thread-3  :18702 [run_manager.py:_on_file_modified():692] file/dir modified: /home/puria-radmard/Repos/satellite-imagery/wandb/run-20200724_234702-2gtfm314/config.yaml
+2020-07-24 23:47:06,605 INFO    Thread-3  :18702 [2gtfm314:run_manager.py:_on_file_modified():692] file/dir modified: /home/puria-radmard/Repos/satellite-imagery/wandb/run-20200724_234702-2gtfm314/config.yaml
