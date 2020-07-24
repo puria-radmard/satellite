@@ -148,6 +148,7 @@ if __name__ == "__main__":
         loss_parameters = json.load(loss_parameters_file)
 
     test_size = args.test_size
+    train_size = args.train_size
 
     if train_size == None:
         train_size = 1 - args.test_size
