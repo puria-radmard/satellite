@@ -53,7 +53,6 @@ import time
 def train_unet(
     **kwargs
 ):
-    exit()
     if torch.cuda.is_available():
         torch.set_default_tensor_type("torch.cuda.FloatTensor")
         model.cuda()
