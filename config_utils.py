@@ -3,9 +3,10 @@ from torch.nn import BCELoss
 
 from perf_metrics import dice_coef
 
-loss_dict = {"BCELoss": BCELoss, "TernausLoss": TernausLossFunc}
 
-test_metric_dict = {"DiceCoefficient": dice_coef}
+loss_dict = {"bce_loss": BCELoss, "ternaus_loss": TernausLossFunc}
+
+test_metric_dict = {"dice_coefficient": dice_coef}
 
 
 def isColab():

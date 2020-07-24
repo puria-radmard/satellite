@@ -1,0 +1,39 @@
+# Sweep across the essential hyperparameters: batch size, learning rate, dropout probability
+
+program: ../train_unet.py
+project: unet
+name: test_sweep
+method: bayes
+
+metric:
+  name: iteration_loss
+  goal: minimise
+
+parameters:
+  lr:
+    distribution: log_uniform
+    min: -16.118
+    max: -9.2103
+  batch_size:
+    distribtuion: uniform
+    min: 15
+    max: 60
+  dropout:
+    distribution: normal
+    min: 0.45
+    max: 0.80
+
+  test_metric:
+    value: dice_coefficient
+  loss_func:
+    value: bce_loss
+  num_epochs: 
+    value: 8
+  save_rate:
+    value: 10
+  dataset:
+    value: dstl
+  dir_name: 
+    value: "test_bayesian_bce_loss"
+  test_size:
+    value: 0.2

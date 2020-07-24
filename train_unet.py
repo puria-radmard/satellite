@@ -66,15 +66,15 @@ def train_unet(
     random_state,
 ):
 
-    model = unet.UNet(dropout=dropout)
-
     if torch.cuda.is_available():
         torch.set_default_tensor_type("torch.cuda.FloatTensor")
         model.cuda()
 
-    wandb.watch(model)
+    model = unet.UNet(dropout=dropout)
 
     loss_func = loss_dict[loss_func](**loss_parameters)
+
+    wandb.watch(model)
 
     print(len(glob(dataset + "/" + "images" + "/*")), "images found total")
 
@@ -86,8 +86,6 @@ def train_unet(
     test_dataloader = DataLoader(
         test_dataset, batch_size=batch_size
     )  # Change to own batch size?
-
-    print(torch.cuda.get_device_name(0))
 
     train_num_steps = len(train_dataloader)
     eval_num_steps = len(test_dataloader)
@@ -113,13 +111,13 @@ def train_unet(
         produceImage(model, epoch, dir_name, dataset)
 
         epoch_metrics = {
-            f"Epoch Loss ({loss_func[1]})": epoch_loss,
-            f"Epoch Score ({test_metric[1]})": epoch_score,
+            f"epoch_loss": epoch_loss,
+            f"epoch_score": epoch_score,
         }
 
         wandb.log(epoch_metrics)
 
-        if epoch % save_rate == 0:
+        if (epoch + 1) % save_rate == 0:
             print(f"      Saving to saves/{dir_name}/epoch_{epoch}")
             torch.save(model.state_dict(), f"saves/{dir_name}/epoch_{epoch}")
 
@@ -153,38 +151,26 @@ if __name__ == "__main__":
     if train_size == None:
         train_size = 1 - args.test_size
 
-    training_settings_dict = {
+    config_dict = {
         "test_metric": args.test_metric,
         "loss_func": args.loss_func,
         "num_epochs": args.num_epochs,
         "save_rate": args.save_rate,
         "random_state": args.random_state,
-    }
-
-    data_parameters_dict = {
         "dataset": args.dataset,
         "dir_name": args.dir_name,
         "test_size": test_size,
         "train_size": train_size,
-    }
-
-    hyperparameters_dict = {
         "lr": args.lr,
         "dropout": args.dropout,
         "batch_size": args.batch_size,
         "loss_parameters": loss_parameters,
     }
 
-    config_dict = {
-        "training_settings": training_settings_dict,
-        "data_parameters": data_parameters_dict,
-        "hyperparmeters": hyperparameters_dict,
-    }
+    wandb.init(project="unet", config=config_dict)
 
-    wandb.init(config=config_dict)
+    config = wandb.config
 
     train_unet(
-        **config_dict["training_settings"],
-        **config_dict["data_parameters"],
-        **config_dict["hyperparameters"],
+        **config
     )

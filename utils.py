@@ -21,6 +21,7 @@ import cv2
 import time
 import wandb
 import subprocess
+import cv2
 
 # Ignore warnings
 import warnings
@@ -121,7 +122,7 @@ def trainEpoch(model, epoch, optimizer, dataloader, num_steps, loss_fn):
         sys.stdout.write("\r" + string)
         time.sleep(0.5)
 
-        wandb.log({"Iteration loss": loss.mean()})
+        wandb.log({"iteration_loss": loss.mean()})
 
         if step == num_steps:
             break
@@ -239,7 +240,7 @@ def produceImage(model, epoch, media_dir_name, data_dir, video=False, figsize=30
     fig.savefig(f"media/{media_dir_name}/epoch_{epoch}.png")
 
     wandb.log(
-        {"Examples images": wandb.Image(f"media/{media_dir_name}/epoch_{epoch}.png")}
+        {"examples_images": wandb.Image(f"media/{media_dir_name}/epoch_{epoch}.png")}
     )
 
 
@@ -288,11 +289,6 @@ def loadRecentModel(save_path):
             )
         return int(recent_epoch), recent_model
 
-
-import cv2
-import matplotlib.pyplot as plt
-from glob import glob as glob
-import numpy as np
 
 
 def generateBoundaryMap(mask_dir, save_dir):
