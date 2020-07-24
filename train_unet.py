@@ -139,6 +139,7 @@ if __name__ == "__main__":
     parser.add_argument("--dropout", type=float)
     parser.add_argument("--save_rate", type=int)
     parser.add_argument("--random_state", type=int, default=1)
+    parser.add_argument("--num_epochs", type=int, default=20)
 
     args = parser.parse_args()
 
