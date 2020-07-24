@@ -11,7 +11,7 @@ jobs:
         id: sync
         with:
           auth: 46c8bbd292e4bc80cde648185ab3530cb6eaf9c1
-          gist_url: https://gist.github.com/puria-radmard/5c94267f5c92dc7c61aa566047eb46ea
+          gist_url: https://gist.github.com/puria-radmard/957b3d099b1ea716e786cfbce6f85e70
           gist_title: Example Gist Title
           gist_description: Example Gist Description
           github_file: /home/puria-radmard/Repos/satellite-imagery/README.md
