@@ -1,13 +1,13 @@
-2020-07-24 23:47:05,600 DEBUG   MainThread:18702 [wandb_config.py:_load_defaults():154] no defaults not found in config-defaults.yaml
-2020-07-24 23:47:05,606 DEBUG   MainThread:18702 [meta.py:_setup_code_git():49] probe for git information
-2020-07-24 23:47:05,650 DEBUG   MainThread:18702 [run_manager.py:__init__():547] Initialized sync for unet/2gtfm314
-2020-07-24 23:47:05,652 INFO    MainThread:18702 [run_manager.py:wrap_existing_process():1149] wrapping existing process 18675
-2020-07-24 23:47:05,653 WARNING MainThread:18702 [io_wrap.py:register():108] SIGWINCH handler was not None: <Handlers.SIG_DFL: 0>
-2020-07-24 23:47:05,736 INFO    MainThread:18702 [run_manager.py:init_run():928] system metrics and metadata threads started
-2020-07-24 23:47:05,736 INFO    MainThread:18702 [run_manager.py:wrap_existing_process():1166] informing user process we are ready to proceed
-2020-07-24 23:47:05,737 INFO    MainThread:18702 [run_manager.py:_sync_etc():1298] entering loop for messages from user process
-2020-07-24 23:47:05,745 INFO    MainThread:18702 [run_manager.py:_sync_etc():1321] received message from user process: {"exitcode": 0}
-2020-07-24 23:47:05,745 INFO    MainThread:18702 [run_manager.py:_sync_etc():1408] closing log streams and sending exitcode to W&B
-2020-07-24 23:47:05,745 INFO    MainThread:18702 [run_manager.py:shutdown():1072] shutting down system stats and metadata service
-2020-07-24 23:47:06,605 INFO    Thread-3  :18702 [run_manager.py:_on_file_modified():692] file/dir modified: /home/puria-radmard/Repos/satellite-imagery/wandb/run-20200724_234702-2gtfm314/config.yaml
-2020-07-24 23:47:06,605 INFO    Thread-3  :18702 [2gtfm314:run_manager.py:_on_file_modified():692] file/dir modified: /home/puria-radmard/Repos/satellite-imagery/wandb/run-20200724_234702-2gtfm314/config.yaml
+2020-07-24 23:58:59,431 DEBUG   MainThread:20391 [wandb_config.py:_load_defaults():154] no defaults not found in config-defaults.yaml
+2020-07-24 23:58:59,436 DEBUG   MainThread:20391 [meta.py:_setup_code_git():49] probe for git information
+2020-07-24 23:58:59,472 DEBUG   MainThread:20391 [run_manager.py:__init__():547] Initialized sync for unet/20wz7qu3
+2020-07-24 23:58:59,474 INFO    MainThread:20391 [run_manager.py:wrap_existing_process():1149] wrapping existing process 20364
+2020-07-24 23:58:59,474 WARNING MainThread:20391 [io_wrap.py:register():108] SIGWINCH handler was not None: <Handlers.SIG_DFL: 0>
+2020-07-24 23:58:59,556 INFO    MainThread:20391 [run_manager.py:init_run():928] system metrics and metadata threads started
+2020-07-24 23:58:59,556 INFO    MainThread:20391 [run_manager.py:wrap_existing_process():1166] informing user process we are ready to proceed
+2020-07-24 23:58:59,557 INFO    MainThread:20391 [run_manager.py:_sync_etc():1298] entering loop for messages from user process
+2020-07-24 23:58:59,569 INFO    MainThread:20391 [run_manager.py:_sync_etc():1321] received message from user process: {"exitcode": 1}
+2020-07-24 23:58:59,569 INFO    MainThread:20391 [run_manager.py:_sync_etc():1408] closing log streams and sending exitcode to W&B
+2020-07-24 23:58:59,570 INFO    MainThread:20391 [run_manager.py:shutdown():1072] shutting down system stats and metadata service
+2020-07-24 23:59:00,439 INFO    Thread-3  :20391 [run_manager.py:_on_file_modified():692] file/dir modified: /home/puria-radmard/Repos/satellite-imagery/wandb/run-20200724_235857-20wz7qu3/config.yaml
+2020-07-24 23:59:00,439 INFO    Thread-3  :20391 [20wz7qu3:run_manager.py:_on_file_modified():692] file/dir modified: /home/puria-radmard/Repos/satellite-imagery/wandb/run-20200724_235857-20wz7qu3/config.yaml

@@ -51,27 +51,28 @@ import time
 
 
 def train_unet(
-    **kwargs
+    config
 ):
+    model = unet.UNet(dropout=config.dropout)
+
     if torch.cuda.is_available():
         torch.set_default_tensor_type("torch.cuda.FloatTensor")
         model.cuda()
 
-    model = unet.UNet(dropout=dropout)
 
-    loss_func = loss_dict[loss_func](**loss_parameters)
+    loss_func = loss_dict[config.loss_func](**config.loss_parameters)
 
     wandb.watch(model)
 
     print(len(glob(dataset + "/" + "images" + "/*")), "images found total")
 
-    optimizer = optim.Adam(model.parameters(), lr=lr)
+    optimizer = optim.Adam(model.parameters(), lr=config.lr)
     train_dataset, test_dataset = train_test_dataset(
-        dataset, test_size=test_size, train_size=train_size, random_state=random_state
+        config.dataset, test_size=config.test_size, train_size=config.train_size, random_state=config.random_state
     )
-    train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
+    train_dataloader = DataLoader(train_dataset, batch_size=config.batch_size)
     test_dataloader = DataLoader(
-        test_dataset, batch_size=batch_size
+        test_dataset, batch_size=config.batch_size
     )  # Change to own batch size?
 
     train_num_steps = len(train_dataloader)
@@ -83,7 +84,7 @@ def train_unet(
     )
 
     # for epoch in range(recent_epoch + 1, recent_epoch + num_epochs + 1):
-    for epoch in range(num_epochs):
+    for epoch in range(config.num_epochs):
 
         epoch_loss = trainEpoch(
             model, epoch, optimizer, train_dataloader, train_num_steps, loss_func
@@ -95,7 +96,7 @@ def train_unet(
         )
         print(f"Evaluating epoch {epoch} done")
 
-        produceImage(model, epoch, dir_name, dataset)
+        produceImage(model, epoch, config.dir_name, config.dataset)
 
         epoch_metrics = {
             f"epoch_loss": epoch_loss,
@@ -105,8 +106,8 @@ def train_unet(
         wandb.log(epoch_metrics)
 
         if (epoch + 1) % save_rate == 0:
-            print(f"      Saving to saves/{dir_name}/epoch_{epoch}")
-            torch.save(model.state_dict(), f"saves/{dir_name}/epoch_{epoch}")
+            print(f"      Saving to saves/{config.dir_name}/epoch_{epoch}")
+            torch.save(model.state_dict(), f"saves/{config.dir_name}/epoch_{epoch}")
 
 
 if __name__ == "__main__":
@@ -161,5 +162,5 @@ if __name__ == "__main__":
     config = wandb.config
 
     train_unet(
-        **config
+        config
     )
