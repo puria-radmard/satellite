@@ -38,8 +38,6 @@ from perf_metrics import *
 
 import wandb
 
-wandb.init(project="unet")
-
 import warnings
 
 warnings.filterwarnings("ignore")
@@ -53,6 +51,9 @@ import time
 def train_unet(
     config
 ):
+
+    import pdb; pdb.set_trace()
+
     model = unet.UNet(dropout=config.dropout)
 
     if torch.cuda.is_available():
@@ -141,7 +142,7 @@ if __name__ == "__main__":
     if train_size == None:
         train_size = 1 - args.test_size
 
-    config_dict = {
+    config = {
         "test_metric": args.test_metric,
         "loss_func": args.loss_func,
         "num_epochs": args.num_epochs,
@@ -157,10 +158,6 @@ if __name__ == "__main__":
         "loss_parameters": loss_parameters,
     }
 
-    wandb.init(project="unet", config=config_dict)
+    wandb.init(project="unet", config=config)
 
-    config = wandb.config
-
-    train_unet(
-        config
-    )
+    train_unet(wandb.config)
