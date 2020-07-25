@@ -154,7 +154,7 @@ if __name__ == "__main__":
         "lr": args.lr,
         "dropout": args.dropout,
         "batch_size": args.batch_size,
-        "loss_parameters": loss_parameters,
+        "loss_parameters": args.loss_parameters,
     }
 
     wandb.init(project="satellite", config=config)
