@@ -66,6 +66,8 @@ def train_unet(config):
         # Wrong params dict for loss, or no parameters passed
         loss_func = loss_dict[config.loss_func]()
 
+    test_metric = test_metric_dict[config.test_metric]
+
     wandb.watch(model)
 
     print(len(glob(config.dataset + "/" + "images" + "/*")), "images found total")
@@ -99,7 +101,7 @@ def train_unet(config):
         print(f"Training epoch {epoch} done")
 
         epoch_score = testModel(
-            model, epoch, test_dataloader, eval_num_steps, test_metric[0]
+            model, epoch, test_dataloader, eval_num_steps, test_metric
         )
         print(f"Evaluating epoch {epoch} done")
 
