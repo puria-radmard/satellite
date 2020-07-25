@@ -1,13 +1,11 @@
 # Sweep across the essential hyperparameters: batch size, learning rate, dropout probability
 
 program: train_unet.py
-project: unet
-name: test_sweep
 method: bayes
 
 metric:
   name: iteration_loss
-  goal: minimise
+  goal: minimize
 
 parameters:
   lr:
@@ -15,7 +13,7 @@ parameters:
     min: -16.118
     max: -9.2103
   batch_size:
-    distribtuion: uniform
+    distribution: int_uniform
     min: 15
     max: 60
   dropout:
