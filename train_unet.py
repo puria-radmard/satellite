@@ -60,7 +60,7 @@ def train_unet(
 
     loss_params = loss_dict.get(config.loss_parameters)
 
-    loss_func = loss_dict[config.loss_func](**loss_param)
+    loss_func = loss_dict[config.loss_func](**loss_params)
 
     wandb.watch(model)
 
