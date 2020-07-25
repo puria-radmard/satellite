@@ -19,7 +19,7 @@ from torch.utils.data import Dataset, DataLoader
 import torch.optim as optim
 import torch.nn as nn
 import argparse
-
+import time
 import sys
 
 sys.path.append("/content/drive/My Drive/Satellite Imagery code")
@@ -44,8 +44,6 @@ warnings.filterwarnings("ignore")
 
 # %matplotlib inline
 
-import sys
-import time
 
 
 def train_unet(config, sweeping = True):
@@ -113,7 +111,7 @@ def train_unet(config, sweeping = True):
 
         wandb.log(epoch_metrics)
 
-        if (epoch + 1) % save_rate == 0:
+        if (epoch + 1) % config.save_rate == 0:
             print(f"      Saving to saves/{config.dir_name}/epoch_{epoch}")
             torch.save(model.state_dict(), f"saves/{config.dir_name}/model")
             produceImage(model, epoch, config.dir_name, config.dataset)
