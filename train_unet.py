@@ -135,10 +135,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    loss_parameters = args.loss_parameters
-    with open(loss_parameters, "r") as loss_parameters_file:
-        loss_parameters = json.load(loss_parameters_file)
-
     test_size = args.test_size
     train_size = args.train_size
 
