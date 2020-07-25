@@ -71,11 +71,11 @@ def ternausLossfunc(preds, labels, l=1, beta=1, HWs=None, JWs=None):
 
 
 class TernausLossFunc(nn.Module):
-    def __init__(self, **kwargs):
+    def __init__(self, l, beta, HWs, JWs):
         """
     Beta is on positive side, so a higher beta stops false negatives more
     """
-        super(TernausLossFunc, self).__init__(l, beta, HWs, JWs)
+        super(TernausLossFunc, self).__init__()
         self.l = l
         self.beta = beta
         self.HWs = HWs
