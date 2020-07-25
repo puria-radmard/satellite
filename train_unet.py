@@ -58,7 +58,8 @@ def train_unet(
         torch.set_default_tensor_type("torch.cuda.FloatTensor")
         model.cuda()
 
-    loss_params = loss_dict.get(config.loss_parameters)
+    with open(config.loss_parameters, "r") as loss_parameters_file:
+        loss_params = json.load(loss_parameters_file)
 
     loss_func = loss_dict[config.loss_func](**loss_params)
 
