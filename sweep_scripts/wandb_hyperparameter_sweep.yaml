@@ -46,10 +46,10 @@ parameters:
   # Sweep does not account performance anyway, just loss
   test_size:
     distribution: constant
-    value: 0.0
+    value: 0.05
   train_size:
     distribution: constant
-    value: 1.0
+    value: 0.95
   
   random_state:
     distribution: constant
