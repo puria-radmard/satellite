@@ -22,7 +22,7 @@ def cross_entropy(y, t, beta):
     return beta_ * t * torch.log2(y) + alpha_ * (1 - t) * torch.log2(1 - y)
 
 
-def perPixelCrossEntropy(preds, labels, HWs, beta):
+def perPixelCrossEntropy(preds, labels, class_weights, beta):
     batch_size, n_classes, H, W = preds.shape
     class_weights = torch.tensor(class_weights, dtype=torch.float)
     class_weights = f.normalize(class_weights, dim=0)
