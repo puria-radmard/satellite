@@ -114,6 +114,9 @@ def train_unet(config):
             torch.save(model.state_dict(), f"saves/{config.dir_name}/model")
             produceImage(model, epoch, config.dir_name, config.dataset)
 
+    # To allow sweeps
+    torch.cuda.empty_cache() 
+
 
 if __name__ == "__main__":
 
