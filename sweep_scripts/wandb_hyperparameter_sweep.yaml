@@ -15,7 +15,7 @@ parameters:
   batch_size:
     distribution: int_uniform
     min: 15
-    max: 60
+    max: 30
   dropout:
     distribution: uniform
     min: 0.45

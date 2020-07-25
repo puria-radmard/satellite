@@ -9,7 +9,6 @@ Original file is located at
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as f
 import numpy as np
 
 
