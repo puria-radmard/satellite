@@ -54,18 +54,15 @@ def train_unet(
 
     model = unet.UNet(dropout=config.dropout)
 
-    import pdb; pdb.set_trace()
-
     if torch.cuda.is_available():
         torch.set_default_tensor_type("torch.cuda.FloatTensor")
         model.cuda()
-
 
     loss_func = loss_dict[config.loss_func](**config.loss_parameters)
 
     wandb.watch(model)
 
-    print(len(glob(dataset + "/" + "images" + "/*")), "images found total")
+    print(len(glob(config.dataset + "/" + "images" + "/*")), "images found total")
 
     optimizer = optim.Adam(model.parameters(), lr=config.lr)
     train_dataset, test_dataset = train_test_dataset(
