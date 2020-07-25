@@ -77,7 +77,7 @@ def train_unet(
     eval_num_steps = len(test_dataloader)
     print(
         "Starting training for {} epochs of {} training steps and {} evaluation steps".format(
-            num_epochs, train_num_steps, eval_num_steps
+            config.num_epochs, train_num_steps, eval_num_steps
         )
     )
 
