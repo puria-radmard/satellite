@@ -105,15 +105,14 @@ def train_unet(config):
         )
         print(f"Evaluating epoch {epoch} done")
 
-        produceImage(model, epoch, config.dir_name, config.dataset)
-
         epoch_metrics = {f"epoch_loss": epoch_loss, f"epoch_score": epoch_score}
 
         wandb.log(epoch_metrics)
 
         if (epoch + 1) % save_rate == 0:
             print(f"      Saving to saves/{config.dir_name}/epoch_{epoch}")
-            torch.save(model.state_dict(), f"saves/{config.dir_name}/epoch_{epoch}")
+            torch.save(model.state_dict(), f"saves/{config.dir_name}/model")
+            produceImage(model, epoch, config.dir_name, config.dataset)
 
 
 if __name__ == "__main__":
@@ -140,7 +139,7 @@ if __name__ == "__main__":
     test_size = args.test_size
     train_size = args.train_size
 
-    if train_size == None:
+    if train_size == None or train_size + test_size > 1.0:
         train_size = 1 - args.test_size
 
     config = {

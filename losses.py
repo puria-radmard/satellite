@@ -79,7 +79,7 @@ class TernausLossFunc(nn.Module):
         """
     Beta is on positive side, so a higher beta stops false negatives more
     """
-        super(TernausLossFunc, self).__init__()
+        super(TernausLossFunc, self).__init__(l, beta, HWs, JWs)
         self.l = l
         self.beta = beta
         self.HWs = HWs
