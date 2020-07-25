@@ -64,7 +64,7 @@ def jaccardIndex(preds, labels, class_weights=None):
 
 def ternausLossfunc(preds, labels, l=1, beta=1, HWs=None, JWs=None):
     # Derived from https://arxiv.org/abs/1801.05746
-    H = perPixelCrossEntropy(preds, labels, beta, HWs)
+    H = perPixelCrossEntropy(preds, labels, HWs, beta)
     J = jaccardIndex(preds, labels, JWs)
     return H - l * torch.log(J + 1e-10)
 
