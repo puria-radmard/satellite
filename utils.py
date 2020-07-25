@@ -71,7 +71,7 @@ class SatelliteDataset(Dataset):
         image = image[:, :, :-1] / 127.5 - 1
 
         label = None
-        if self.type_ is not "media":
+        if self.type_ != "media":
             label_name = os.path.join(
                 self.root_dir, self.labels_dir, self.name_list[idx]
             )
@@ -83,7 +83,7 @@ class SatelliteDataset(Dataset):
                 sample = self.transform(sample)
 
         sample = (
-            {"image": image, "label": label} if self.type_ is not "media" else image
+            {"image": image, "label": label} if self.type_ != "media" else image
         )
 
         return sample

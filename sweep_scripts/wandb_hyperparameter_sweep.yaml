@@ -38,7 +38,7 @@ parameters:
     value: 10
   dataset:
     distribution: constant
-    value: "dstl"
+    value: "data/dstl"
   dir_name: 
     distribution: constant
     value: "test_bayesian_bce_loss"
