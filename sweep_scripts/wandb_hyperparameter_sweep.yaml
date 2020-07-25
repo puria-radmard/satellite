@@ -6,7 +6,7 @@ method: bayes
 metric:
   name: iteration_loss
   goal: minimize
-
+  
 parameters:
   lr:
     distribution: log_uniform
@@ -32,7 +32,7 @@ parameters:
   #   value: "loss_parameters/ternaus_loss.json"
   num_epochs: 
     distribution: constant
-    value: 8
+    value: 5
   save_rate:
     distribution: constant
     value: 10
@@ -49,7 +49,7 @@ parameters:
     value: 0.05
   train_size:
     distribution: constant
-    value: 0.95
+    value: 0.8
   
   random_state:
     distribution: constant
