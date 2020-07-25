@@ -27,6 +27,9 @@ parameters:
   loss_func:
     distribution: constant
     value: "bce_loss"
+  loss_parameters:
+    distribution: constant
+    value: "loss_parameters/ternaus_loss.json"
   num_epochs: 
     distribution: constant
     value: 8
@@ -39,6 +42,15 @@ parameters:
   dir_name: 
     distribution: constant
     value: "test_bayesian_bce_loss"
+
+  # Sweep does not account performance anyway, just loss
   test_size:
     distribution: constant
-    value: 0.2
+    value: 0.0
+  train_size:
+    distribution: constant
+    value: 1.0
+  
+  random_state:
+    distribution: constant
+    value: 1
