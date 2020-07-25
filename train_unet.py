@@ -52,9 +52,9 @@ def train_unet(
     config
 ):
 
-    import pdb; pdb.set_trace()
-
     model = unet.UNet(dropout=config.dropout)
+
+    import pdb; pdb.set_trace()
 
     if torch.cuda.is_available():
         torch.set_default_tensor_type("torch.cuda.FloatTensor")
