@@ -290,7 +290,6 @@ def loadRecentModel(save_path):
         return int(recent_epoch), recent_model
 
 
-
 def generateBoundaryMap(mask_dir, save_dir):
     mask = cv2.imread(mask_dir)
 

@@ -27,9 +27,9 @@ parameters:
   loss_func:
     distribution: constant
     value: "bce_loss"
-  loss_parameters:
-    distribution: constant
-    value: "loss_parameters/ternaus_loss.json"
+  # loss_parameters:
+  #   distribution: constant
+  #   value: "loss_parameters/ternaus_loss.json"
   num_epochs: 
     distribution: constant
     value: 8

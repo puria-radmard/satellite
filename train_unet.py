@@ -48,9 +48,7 @@ import sys
 import time
 
 
-def train_unet(
-    config
-):
+def train_unet(config):
 
     model = unet.UNet(dropout=config.dropout)
 
@@ -58,10 +56,15 @@ def train_unet(
         torch.set_default_tensor_type("torch.cuda.FloatTensor")
         model.cuda()
 
-    with open(config.loss_parameters, "r") as loss_parameters_file:
-        loss_params = json.load(loss_parameters_file)
+    try:
+        with open(config.loss_parameters, "r") as loss_parameters_file:
+            loss_params = json.load(loss_parameters_file)
 
-    loss_func = loss_dict[config.loss_func](**loss_params)
+        loss_func = loss_dict[config.loss_func](**loss_params)
+
+    except TypeError:
+        # Wrong params dict for loss, or no parameters passed
+        loss_func = loss_dict[config.loss_func]()
 
     wandb.watch(model)
 
@@ -69,7 +72,10 @@ def train_unet(
 
     optimizer = optim.Adam(model.parameters(), lr=config.lr)
     train_dataset, test_dataset = train_test_dataset(
-        config.dataset, test_size=config.test_size, train_size=config.train_size, random_state=config.random_state
+        config.dataset,
+        test_size=config.test_size,
+        train_size=config.train_size,
+        random_state=config.random_state,
     )
     train_dataloader = DataLoader(train_dataset, batch_size=config.batch_size)
     test_dataloader = DataLoader(
@@ -99,10 +105,7 @@ def train_unet(
 
         produceImage(model, epoch, config.dir_name, config.dataset)
 
-        epoch_metrics = {
-            f"epoch_loss": epoch_loss,
-            f"epoch_score": epoch_score,
-        }
+        epoch_metrics = {f"epoch_loss": epoch_loss, f"epoch_score": epoch_score}
 
         wandb.log(epoch_metrics)
 

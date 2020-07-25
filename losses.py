@@ -16,7 +16,7 @@ import numpy as np
 def cross_entropy(y, t, beta):
     # y is preds, t is labels as per Bishop
     # Normalise ratio
-    try: 
+    try:
         beta = beta[0]
     except:
         pass
@@ -33,7 +33,9 @@ def perPixelCrossEntropy(preds, labels, class_weights, beta):
     size = torch.prod(torch.tensor(labels.shape)).float()
 
     assert preds.shape == labels.shape
-    class_losses = -(1 / size) * torch.sum(cross_entropy(preds, labels, beta), dim=(0, 2, 3))
+    class_losses = -(1 / size) * torch.sum(
+        cross_entropy(preds, labels, beta), dim=(0, 2, 3)
+    )
     try:
         assert not any(torch.isnan(class_losses))
     except AssertionError:
@@ -74,7 +76,7 @@ def ternausLossfunc(preds, labels, l=1, beta=1, HWs=None, JWs=None):
 
 
 class TernausLossFunc(nn.Module):
-    def __init__(self, l=1, beta=1, HWs=None, JWs=None):
+    def __init__(self, **kwargs):
         """
     Beta is on positive side, so a higher beta stops false negatives more
     """
