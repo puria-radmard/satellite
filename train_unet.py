@@ -21,6 +21,7 @@ import torch.nn as nn
 import argparse
 import time
 import sys
+import numba
 
 sys.path.append("/content/drive/My Drive/Satellite Imagery code")
 
@@ -50,7 +51,8 @@ def train_unet(config, sweeping = True):
 
     if sweeping:
         # To allow sweeps
-        torch.cuda.empty_cache()
+        device = numba.cuda.get_current_device()
+        device.reset()
 
     model = unet.UNet(dropout=config.dropout)
 

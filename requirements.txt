@@ -4,3 +4,4 @@ skimage==0.16.2
 matplotlib
 cv2==4.1.2
 wandb==0.9.3
+numba
