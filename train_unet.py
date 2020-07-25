@@ -19,8 +19,9 @@ from torch.utils.data import Dataset, DataLoader
 import torch.optim as optim
 import torch.nn as nn
 import argparse
-
+import time
 import sys
+
 
 sys.path.append("/content/drive/My Drive/Satellite Imagery code")
 
@@ -38,67 +39,64 @@ from perf_metrics import *
 
 import wandb
 
-wandb.init(project="unet")
-
 import warnings
 
 warnings.filterwarnings("ignore")
 
 # %matplotlib inline
 
-import sys
-import time
 
 
-def train_unet(
-    dataset,  #
-    batch_size,  #
-    loss_func,  #
-    test_metric,  #
-    num_epochs,  #
-    dir_name,  #
-    dropout,  #
-    lr,  #
-    loss_parameters,  #
-    save_rate,
-    test_size,  #
-    train_size,  #
-    random_state,
-):
+def train_unet(config, sweeping = True):
 
-    model = unet.UNet(dropout=dropout)
+    if sweeping:
+        # To allow sweeps
+        torch.cuda.empty_cache()
+
+    model = unet.UNet(dropout=config.dropout)
 
     if torch.cuda.is_available():
         torch.set_default_tensor_type("torch.cuda.FloatTensor")
         model.cuda()
 
+    try:
+        with open(config.loss_parameters, "r") as loss_parameters_file:
+            loss_params = json.load(loss_parameters_file)
+
+        loss_func = loss_dict[config.loss_func](**loss_params)
+
+    except TypeError:
+        # Wrong params dict for loss, or no parameters passed
+        loss_func = loss_dict[config.loss_func]()
+
+    test_metric = test_metric_dict[config.test_metric]
+
     wandb.watch(model)
 
-    loss_func = loss_dict[loss_func](**loss_parameters)
+    print(len(glob(config.dataset + "/" + "images" + "/*")), "images found total")
 
-    print(len(glob(dataset + "/" + "images" + "/*")), "images found total")
-
-    optimizer = optim.Adam(model.parameters(), lr=lr)
+    optimizer = optim.Adam(model.parameters(), lr=config.lr)
     train_dataset, test_dataset = train_test_dataset(
-        dataset, test_size=test_size, train_size=train_size, random_state=random_state
+        config.dataset,
+        test_size=config.test_size,
+        train_size=config.train_size,
+        random_state=config.random_state,
     )
-    train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
+    train_dataloader = DataLoader(train_dataset, batch_size=config.batch_size)
     test_dataloader = DataLoader(
-        test_dataset, batch_size=batch_size
+        test_dataset, batch_size=config.batch_size
     )  # Change to own batch size?
-
-    print(torch.cuda.get_device_name(0))
 
     train_num_steps = len(train_dataloader)
     eval_num_steps = len(test_dataloader)
     print(
         "Starting training for {} epochs of {} training steps and {} evaluation steps".format(
-            num_epochs, train_num_steps, eval_num_steps
+            config.num_epochs, train_num_steps, eval_num_steps
         )
     )
 
     # for epoch in range(recent_epoch + 1, recent_epoch + num_epochs + 1):
-    for epoch in range(num_epochs):
+    for epoch in range(config.num_epochs):
 
         epoch_loss = trainEpoch(
             model, epoch, optimizer, train_dataloader, train_num_steps, loss_func
@@ -106,22 +104,20 @@ def train_unet(
         print(f"Training epoch {epoch} done")
 
         epoch_score = testModel(
-            model, epoch, test_dataloader, eval_num_steps, test_metric[0]
+            model, epoch, test_dataloader, eval_num_steps, test_metric
         )
         print(f"Evaluating epoch {epoch} done")
 
-        produceImage(model, epoch, dir_name, dataset)
-
-        epoch_metrics = {
-            f"Epoch Loss ({loss_func[1]})": epoch_loss,
-            f"Epoch Score ({test_metric[1]})": epoch_score,
-        }
+        epoch_metrics = {f"epoch_loss": epoch_loss, f"epoch_score": epoch_score}
 
         wandb.log(epoch_metrics)
 
-        if epoch % save_rate == 0:
-            print(f"      Saving to saves/{dir_name}/epoch_{epoch}")
-            torch.save(model.state_dict(), f"saves/{dir_name}/epoch_{epoch}")
+        if (epoch + 1) % config.save_rate == 0:
+            print(f"      Saving to saves/{config.dir_name}/epoch_{epoch}")
+            torch.save(model.state_dict(), f"saves/{config.dir_name}/model")
+            produceImage(model, epoch, config.dir_name, config.dataset)
+
+
 
 
 if __name__ == "__main__":
@@ -141,50 +137,32 @@ if __name__ == "__main__":
     parser.add_argument("--dropout", type=float)
     parser.add_argument("--save_rate", type=int)
     parser.add_argument("--random_state", type=int, default=1)
+    parser.add_argument("--num_epochs", type=int, default=20)
 
     args = parser.parse_args()
 
-    loss_parameters = args.loss_parameters
-    with open(loss_parameters, "r") as loss_parameters_file:
-        loss_parameters = json.load(loss_parameters_file)
-
     test_size = args.test_size
+    train_size = args.train_size
 
-    if train_size == None:
+    if train_size == None or train_size + test_size > 1.0:
         train_size = 1 - args.test_size
 
-    training_settings_dict = {
+    config = {
         "test_metric": args.test_metric,
         "loss_func": args.loss_func,
         "num_epochs": args.num_epochs,
         "save_rate": args.save_rate,
         "random_state": args.random_state,
-    }
-
-    data_parameters_dict = {
         "dataset": args.dataset,
         "dir_name": args.dir_name,
         "test_size": test_size,
         "train_size": train_size,
-    }
-
-    hyperparameters_dict = {
         "lr": args.lr,
         "dropout": args.dropout,
         "batch_size": args.batch_size,
-        "loss_parameters": loss_parameters,
+        "loss_parameters": args.loss_parameters,
     }
 
-    config_dict = {
-        "training_settings": training_settings_dict,
-        "data_parameters": data_parameters_dict,
-        "hyperparmeters": hyperparameters_dict,
-    }
+    wandb.init(project="satellite", config=config)
 
-    wandb.init(config=config_dict)
-
-    train_unet(
-        **config_dict["training_settings"],
-        **config_dict["data_parameters"],
-        **config_dict["hyperparameters"],
-    )
+    train_unet(wandb.config)

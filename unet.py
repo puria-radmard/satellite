@@ -93,7 +93,7 @@ class UNet(nn.Module):
         convchan4 = 512
         convchan5 = 1024
 
-        self.down1 = UNetDownBlock(n_channels, convchan1, max_before=False)
+        self.down1 = UNetDownBlock(n_channels, convchan1, dropout, max_before=False)
         self.down2 = UNetDownBlock(convchan1, convchan2, dropout)
         self.down3 = UNetDownBlock(convchan2, convchan3, dropout)
         self.down4 = UNetDownBlock(convchan3, convchan4, dropout)

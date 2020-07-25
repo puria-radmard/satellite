@@ -1,0 +1,56 @@
+# Sweep across the essential hyperparameters: batch size, learning rate, dropout probability
+
+program: train_unet.py
+method: bayes
+
+metric:
+  name: iteration_loss
+  goal: minimize
+  
+parameters:
+  lr:
+    distribution: log_uniform
+    min: -16.118
+    max: -9.2103
+  batch_size:
+    distribution: int_uniform
+    min: 15
+    max: 30
+  dropout:
+    distribution: uniform
+    min: 0.45
+    max: 0.80
+
+  test_metric:
+    distribution: constant
+    value: "dice_coefficient"
+  loss_func:
+    distribution: constant
+    value: "bce_loss"
+  # loss_parameters:
+  #   distribution: constant
+  #   value: "loss_parameters/ternaus_loss.json"
+  num_epochs: 
+    distribution: constant
+    value: 5
+  save_rate:
+    distribution: constant
+    value: 10
+  dataset:
+    distribution: constant
+    value: "data/dstl"
+  dir_name: 
+    distribution: constant
+    value: "test_bayesian_bce_loss"
+
+  # Sweep does not account performance anyway, just loss
+  test_size:
+    distribution: constant
+    value: 0.05
+  train_size:
+    distribution: constant
+    value: 0.8
+  
+  random_state:
+    distribution: constant
+    value: 1

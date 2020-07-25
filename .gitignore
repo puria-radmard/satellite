@@ -1,3 +1,6 @@
 github_push.sh
-data
-media
+data/*/*/*
+media/*/*
+saves/*/*
+wandb
+__pycache__
