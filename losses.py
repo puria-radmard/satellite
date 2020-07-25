@@ -22,7 +22,7 @@ def cross_entropy(y, t, beta):
     return beta_ * t * torch.log2(y) + alpha_ * (1 - t) * torch.log2(1 - y)
 
 
-def perPixelCrossEntropy(preds, labels, class_weights=None):
+def perPixelCrossEntropy(preds, labels, HWs, class_weights=None):
     batch_size, n_classes, H, W = preds.shape
     if class_weights == None:
         class_weights = torch.ones(n_classes)
@@ -30,7 +30,7 @@ def perPixelCrossEntropy(preds, labels, class_weights=None):
     size = torch.prod(torch.tensor(labels.shape)).float()
 
     assert preds.shape == labels.shape
-    class_losses = -(1 / size) * torch.sum(cross_entropy(preds, labels), dim=(0, 2, 3))
+    class_losses = -(1 / size) * torch.sum(cross_entropy(preds, labels, beta), dim=(0, 2, 3))
     try:
         assert not any(torch.isnan(class_losses))
     except AssertionError:
@@ -66,7 +66,7 @@ def jaccardIndex(preds, labels, class_weights=None):
 
 def ternausLossfunc(preds, labels, l=1, beta=1, HWs=None, JWs=None):
     # Derived from https://arxiv.org/abs/1801.05746
-    H = perPixelCrossEntropy(preds, labels, HWs, beta)
+    H = perPixelCrossEntropy(preds, labels, beta, HWs)
     J = jaccardIndex(preds, labels, JWs)
     return H - l * torch.log(J + 1e-10)
 
