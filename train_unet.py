@@ -155,6 +155,6 @@ if __name__ == "__main__":
         "loss_parameters": loss_parameters,
     }
 
-    wandb.init(project="unet", config=config)
+    wandb.init(project="satellite", config=config)
 
     train_unet(wandb.config)
