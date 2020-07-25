@@ -22,10 +22,8 @@ def cross_entropy(y, t, beta):
     return beta_ * t * torch.log2(y) + alpha_ * (1 - t) * torch.log2(1 - y)
 
 
-def perPixelCrossEntropy(preds, labels, HWs, class_weights=None):
+def perPixelCrossEntropy(preds, labels, HWs, beta):
     batch_size, n_classes, H, W = preds.shape
-    if class_weights == None:
-        class_weights = [1] * n_classes
     class_weights = torch.tensor(class_weights, dtype=torch.float)
     class_weights = f.normalize(class_weights, dim=0)
     size = torch.prod(torch.tensor(labels.shape)).float()
@@ -45,8 +43,6 @@ def perPixelCrossEntropy(preds, labels, HWs, class_weights=None):
 
 def jaccardIndex(preds, labels, class_weights=None):
     batch_size, n_classes, H, W = preds.shape
-    if class_weights == None:
-        class_weights = [1] * n_classes
     class_weights = torch.tensor(class_weights, dtype=torch.float)
     class_weights = f.normalize(class_weights, dim=0)
     size = torch.prod(torch.tensor(labels.shape)).float()
