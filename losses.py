@@ -26,7 +26,7 @@ def perPixelCrossEntropy(preds, labels, HWs, class_weights=None):
     batch_size, n_classes, H, W = preds.shape
     if class_weights == None:
         class_weights = [1] * n_classes
-    class_weights = torch.tensor(class_weights, torch.float)
+    class_weights = torch.tensor(class_weights, dtype=torch.float)
     class_weights = f.normalize(class_weights, dim=0)
     size = torch.prod(torch.tensor(labels.shape)).float()
 
