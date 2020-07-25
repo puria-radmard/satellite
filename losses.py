@@ -16,6 +16,7 @@ import numpy as np
 def cross_entropy(y, t, beta):
     # y is preds, t is labels as per Bishop
     # Normalise ratio
+    import pdb; pdb.set_trace()
     mag = np.sqrt(beta ** 2 + 1)
     beta_ = beta / mag
     alpha_ = 1 / mag
