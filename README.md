@@ -1,6 +1,7 @@
 # Detecting urban heat island morphology using satellite imagery
 
 Originally built with Google Colab
+
 Data download and pre-processing pipeline coming soon
 
 ##### WandB project: https://app.wandb.ai/puria-radmard/satellite
