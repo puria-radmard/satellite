@@ -3,6 +3,8 @@
 Originally built with Google Colab
 Data download and pre-processing pipeline coming soon
 
+##### WandB project: https://app.wandb.ai/puria-radmard/satellite
+
 ### Running training loop
 
 To run a training loop with set parameters, first set up your directory like this
